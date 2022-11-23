@@ -1,7 +1,6 @@
 package dad.miclienteftp;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
@@ -11,17 +10,23 @@ import org.apache.commons.net.ftp.FTPFile;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 
 public class RootController implements Initializable {
 
@@ -32,19 +37,33 @@ public class RootController implements Initializable {
 	// model
 
 	private ObjectProperty<FTPClient> cliente = new SimpleObjectProperty<>();
-
 	private BooleanProperty conectado = new SimpleBooleanProperty();
+	private StringProperty directorio = new SimpleStringProperty();
+//	private ListProperty<FTPFile> directorios = new SimpleListProperty<>();
+	private ListProperty<Directorio> directorios = new SimpleListProperty<>();
 
 	// view
 
 	@FXML
-	private VBox view;
-
+	private BorderPane view;
+	
+	@FXML
+	private MenuItem conectarItem, desconectarItem;
+	
 	@FXML
 	private Label infoLabel;
-
+	
 	@FXML
-	private Button conectarButton, desconectarButton;
+    private TableView<Directorio> directoriosTable;
+	
+	@FXML
+    private TableColumn<Directorio, String> nombreColumn;
+
+    @FXML
+    private TableColumn<Directorio, Number> tamanioColumn;
+
+    @FXML
+    private TableColumn<Directorio, Tipo> tipoColumn;
 
 	public RootController() throws IOException {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RootView.fxml"));
@@ -56,12 +75,17 @@ public class RootController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 		// bindings
-
+		
+		directoriosTable.itemsProperty().bind(directorios);
+		nombreColumn.setCellValueFactory(v -> v.getValue().nombreProperty());
+		tamanioColumn.setCellValueFactory(v -> v.getValue().tamanioProperty());
+		tipoColumn.setCellValueFactory(v -> v.getValue().tipoProperty());
+		
 		infoLabel.textProperty()
-				.bind(Bindings.when(conectado).then("Conectado al servidor FTP").otherwise("Desconectado"));
+				.bind(Bindings.when(conectado).then(directorio.get()).otherwise("Desconectado"));
 
-		conectarButton.disableProperty().bind(conectado);
-		desconectarButton.disableProperty().bind(conectado.not());
+		conectarItem.disableProperty().bind(conectado);
+		desconectarItem.disableProperty().bind(conectado.not());
 
 		cliente.bindBidirectional(loginController.clienteProperty());
 
@@ -81,6 +105,8 @@ public class RootController implements Initializable {
 			// servidor
 
 			try {
+				directorio.set(cliente.get().printWorkingDirectory());
+				
 				FTPFile[] ficheros = cliente.get().listFiles();
 
 				// recorrer el listado de archivos recuperados
@@ -90,13 +116,13 @@ public class RootController implements Initializable {
 				System.out.format("| Nombre                                   | Tamaño (bytes) | Tipo            |%n");
 				System.out.format("+------------------------------------------+----------------+-----------------+%n");
 				Arrays.stream(ficheros).forEach(fichero -> {
+					
 					System.out.format("| %-40s | %-14d | %-15s |%n", fichero.getName(), fichero.getSize(),
 							fichero.getType());
 				});
 				System.out.format("+------------------------------------------+----------------+-----------------+%n");
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -118,19 +144,19 @@ public class RootController implements Initializable {
 
 	}
 
-	public VBox getView() {
+	public BorderPane getView() {
 		return view;
 	}
 
 	@FXML
-	void onConectarButton(ActionEvent event) {
+	void onConectarAction(ActionEvent event) {
 
 		loginController.show();
 
 	}
 
 	@FXML
-	void onDesconectarButton(ActionEvent event) {
+	void onDesconectarAction(ActionEvent event) {
 
 		try {
 			cliente.get().disconnect();
@@ -139,6 +165,13 @@ public class RootController implements Initializable {
 			e.printStackTrace();
 		}
 
+	}
+	
+	@FXML
+	void onDescargarAction(ActionEvent event) {
+
+		//TODO implementar
+		
 	}
 
 }

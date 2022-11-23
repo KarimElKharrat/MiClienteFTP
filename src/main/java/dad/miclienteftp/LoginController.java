@@ -2,6 +2,7 @@ package dad.miclienteftp;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -18,7 +19,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -99,22 +103,41 @@ public class LoginController implements Initializable {
 
 	@FXML
 	void onConectarButton(ActionEvent event) {
-
 		try {
-
 			FTPClient ftp = new FTPClient();
 			ftp.connect(servidor.get(), puerto.get());
 			ftp.login(usuario.get(), password.get());
 			cliente.set(ftp);
 			stage.close();
-
 		} catch (IOException e) {
-
-			e.printStackTrace();
+			error();
+//			e.printStackTrace();
 			cliente.set(null);
-
 		}
-
+	}
+	
+	public void exito() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+    	alert.setTitle("Conexión");
+    	alert.setHeaderText("Conexción establecida con éxito.");
+    	alert.initOwner(MiClienteFTPApp.primaryStage);
+    	
+    	Optional<ButtonType> result = alert.showAndWait();
+    	if (result.get() == ButtonType.OK){
+    		MiClienteFTPApp.primaryStage.close();
+    	}
+	}
+	
+	public void error() {
+		Alert alert = new Alert(AlertType.ERROR);
+    	alert.setTitle("Error");
+    	alert.setHeaderText("No se pudo conectar: " + servidor.get());
+    	alert.initOwner(MiClienteFTPApp.primaryStage);
+    	
+    	Optional<ButtonType> result = alert.showAndWait();
+    	if (result.get() == ButtonType.OK){
+    		MiClienteFTPApp.primaryStage.close();
+    	}
 	}
 
 	public void show() {
