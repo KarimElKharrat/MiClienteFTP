@@ -1,12 +1,12 @@
-package dad.miclienteftp;
+package dad.miclienteftp.controllers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.apache.commons.net.ftp.FTPClient;
 
+import dad.miclienteftp.MiClienteFTPApp;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -22,7 +22,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -109,6 +108,7 @@ public class LoginController implements Initializable {
 			ftp.login(usuario.get(), password.get());
 			cliente.set(ftp);
 			stage.close();
+			exito();
 		} catch (IOException e) {
 			error();
 //			e.printStackTrace();
@@ -122,10 +122,7 @@ public class LoginController implements Initializable {
     	alert.setHeaderText("Conexción establecida con éxito.");
     	alert.initOwner(MiClienteFTPApp.primaryStage);
     	
-    	Optional<ButtonType> result = alert.showAndWait();
-    	if (result.get() == ButtonType.OK){
-    		MiClienteFTPApp.primaryStage.close();
-    	}
+    	alert.showAndWait();
 	}
 	
 	public void error() {
@@ -134,10 +131,7 @@ public class LoginController implements Initializable {
     	alert.setHeaderText("No se pudo conectar: " + servidor.get());
     	alert.initOwner(MiClienteFTPApp.primaryStage);
     	
-    	Optional<ButtonType> result = alert.showAndWait();
-    	if (result.get() == ButtonType.OK){
-    		MiClienteFTPApp.primaryStage.close();
-    	}
+    	alert.showAndWait();
 	}
 
 	public void show() {

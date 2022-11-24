@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <BorderPane fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
@@ -31,7 +30,7 @@
       </VBox>
    </top>
    <center>
-      <TableView fx:id="directoriosTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+      <TableView fx:id="directoriosTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#onMouseClicked" BorderPane.alignment="CENTER">
         <columns>
           <TableColumn fx:id="nombreColumn" prefWidth="75.0" text="Nombre" />
           <TableColumn fx:id="tamanioColumn" prefWidth="75.0" text="Tamaño" />

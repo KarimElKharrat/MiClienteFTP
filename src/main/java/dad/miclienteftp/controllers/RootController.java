@@ -1,4 +1,4 @@
-package dad.miclienteftp;
+package dad.miclienteftp.controllers;
 
 import java.io.IOException;
 import java.net.URL;
@@ -8,7 +8,8 @@ import java.util.ResourceBundle;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
-import javafx.beans.binding.Bindings;
+import dad.miclienteftp.model.Directorio;
+import dad.miclienteftp.model.Tipo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -18,6 +19,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 public class RootController implements Initializable {
@@ -39,9 +42,9 @@ public class RootController implements Initializable {
 	private ObjectProperty<FTPClient> cliente = new SimpleObjectProperty<>();
 	private BooleanProperty conectado = new SimpleBooleanProperty();
 	private StringProperty directorio = new SimpleStringProperty();
-//	private ListProperty<FTPFile> directorios = new SimpleListProperty<>();
-	private ListProperty<Directorio> directorios = new SimpleListProperty<>();
-
+	private ListProperty<Directorio> directorios = new SimpleListProperty<>(FXCollections.observableArrayList());
+	private int i = 0;
+	
 	// view
 
 	@FXML
@@ -81,8 +84,7 @@ public class RootController implements Initializable {
 		tamanioColumn.setCellValueFactory(v -> v.getValue().tamanioProperty());
 		tipoColumn.setCellValueFactory(v -> v.getValue().tipoProperty());
 		
-		infoLabel.textProperty()
-				.bind(Bindings.when(conectado).then(directorio.get()).otherwise("Desconectado"));
+		infoLabel.textProperty().bind(directorio);
 
 		conectarItem.disableProperty().bind(conectado);
 		desconectarItem.disableProperty().bind(conectado.not());
@@ -94,7 +96,22 @@ public class RootController implements Initializable {
 		cliente.addListener((o, ov, nv) -> onClienteChanged(o, ov, nv));
 
 		conectado.addListener((o, ov, nv) -> onConectadoChanged(o, ov, nv));
+		
+		// load data
+		
+		directorio.set("Desconectado");
+		
+		// click
+		
+		directoriosTable.getSelectionModel().selectedItemProperty().addListener(this::onSelectedChangedListener);
+		
 
+	}
+
+	private void onSelectedChangedListener(ObservableValue<? extends Directorio> o, Directorio ov, Directorio nv) {
+		
+		i = 0;
+		
 	}
 
 	private void onConectadoChanged(ObservableValue<? extends Boolean> o, Boolean ov, Boolean nv) {
@@ -108,19 +125,20 @@ public class RootController implements Initializable {
 				directorio.set(cliente.get().printWorkingDirectory());
 				
 				FTPFile[] ficheros = cliente.get().listFiles();
+				
 
-				// recorrer el listado de archivos recuperados
-				System.out.format("+------------------------+%n");
-				System.out.format("| Archivos del servidor: |%n");
-				System.out.format("+------------------------+-----------------+----------------+-----------------+%n");
-				System.out.format("| Nombre                                   | Tamaño (bytes) | Tipo            |%n");
-				System.out.format("+------------------------------------------+----------------+-----------------+%n");
+//				// recorrer el listado de archivos recuperados
+//				System.out.format("+------------------------+%n");
+//				System.out.format("| Archivos del servidor: |%n");
+//				System.out.format("+------------------------+-----------------+----------------+-----------------+%n");
+//				System.out.format("| Nombre                                   | Tamaño (bytes) | Tipo            |%n");
+//				System.out.format("+------------------------------------------+----------------+-----------------+%n");
 				Arrays.stream(ficheros).forEach(fichero -> {
-					
-					System.out.format("| %-40s | %-14d | %-15s |%n", fichero.getName(), fichero.getSize(),
-							fichero.getType());
+					directorios.add(new Directorio(fichero.getName(), fichero.getSize(), fichero.getType()));
+//					System.out.format("| %-40s | %-14d | %-15s |%n", fichero.getName(), fichero.getSize(),
+//							fichero.getType());
 				});
-				System.out.format("+------------------------------------------+----------------+-----------------+%n");
+//				System.out.format("+------------------------------------------+----------------+-----------------+%n");
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -161,6 +179,8 @@ public class RootController implements Initializable {
 		try {
 			cliente.get().disconnect();
 			cliente.set(null);
+			directorios.clear();
+			directorio.set("Desconectado");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -173,5 +193,19 @@ public class RootController implements Initializable {
 		//TODO implementar
 		
 	}
+	
+	@FXML
+    void onMouseClicked(MouseEvent event) throws IOException {
+		i++;
+		if (i == 2 && directoriosTable.getSelectionModel().getSelectedItem() != null) {
+			
+			cliente.get().changeWorkingDirectory(
+				cliente.get().printWorkingDirectory() + 
+				directoriosTable.getSelectionModel().getSelectedItem().getNombre()
+			);
+			
+			//TODO meter todo lo de rellenar en una funcion
+	    }
+    }
 
 }

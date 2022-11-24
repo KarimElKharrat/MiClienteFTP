@@ -1,5 +1,6 @@
 package dad.miclienteftp;
 
+import dad.miclienteftp.controllers.RootController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
