@@ -31,7 +31,7 @@ public class MiClienteFTPApp extends Application {
 	}
 	
 	public void stop() throws Exception {
-		rootController.onCloseRequest();
+		rootController.close();
     }
 
 }

@@ -111,7 +111,6 @@ public class LoginController implements Initializable {
 			exito();
 		} catch (IOException e) {
 			error();
-//			e.printStackTrace();
 			cliente.set(null);
 		}
 	}

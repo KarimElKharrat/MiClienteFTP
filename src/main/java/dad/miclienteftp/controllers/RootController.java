@@ -136,14 +136,14 @@ public class RootController implements Initializable {
 	private void onConectadoChanged(ObservableValue<? extends Boolean> o, Boolean ov, Boolean nv) {
 		if (nv) {
 			try {
-				loadDirectory();
+				loadDirectories();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private void loadDirectory() throws IOException {
+	private void loadDirectories() throws IOException {
 		
 		directorio.set(cliente.get().printWorkingDirectory());
 		directorios.clear();
@@ -246,12 +246,12 @@ public class RootController implements Initializable {
 				);
 			}
 			
-			loadDirectory();
+			loadDirectories();
 			
 	    }
     }
 
-	public void onCloseRequest() {
+	public void close() {
 		try {
 			if(cliente.get() != null)
 				cliente.get().disconnect();
