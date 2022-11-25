@@ -1,8 +1,8 @@
 package dad.miclienteftp.model;
 
 public enum Tipo {
-	DIRECTORIO(0), 
-	FICHERO(1), 
+	FICHERO(0), 
+	DIRECTORIO(1), 
 	ENLACE(2);
 
 	private final int valor;

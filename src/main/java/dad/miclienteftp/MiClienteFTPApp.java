@@ -29,5 +29,9 @@ public class MiClienteFTPApp extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
+	public void stop() throws Exception {
+		rootController.onCloseRequest();
+    }
 
 }
